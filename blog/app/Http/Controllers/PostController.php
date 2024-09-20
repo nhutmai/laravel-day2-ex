@@ -7,35 +7,49 @@ use Illuminate\Support\Facades\DB;
 
 class PostController extends Controller
 {
-    //insert
-    function createPost(Request $request)
-    {
-        DB::table("posts")->insert([
-            "title"=>"the 1 post",
-            "content"=>"the content",
-            "created_at"=>now(),
-            "updated_at"=>now()
-        ]);
-        DB::table("posts")->insert([
-            "title"=>"the 2 post",
-            "content"=>"the 2 content",
-            "created_at"=>now(),
-            "updated_at"=>now()
-        ]);
-        DB::table("posts")->insert([
-            "title"=>"the 3 post",
-            "content"=>"the 3 content",
-            "created_at"=>now(),
-            "updated_at"=>now()
-        ]);
 
-        return "the post is created succesfully";
-    }
-
-    public function getPosts()
+    public function index()
     {
         $posts = DB::table("posts")->get();
-        return view ("posts", ["posts"=>$posts]);
+        return view ("blog.index", ["posts"=>$posts]);
+    }
+
+    function  createPost(){
+        return view ("blog.create");
+    }
+    function storePost(Request $request)
+    {
+        $title= $request->input("title");
+        $content= $request->input("content");
+        $created_at= now();
+        $updated_at= now();
+        DB::table("posts")->insert([
+            "title"=>$title,
+            "content"=>$content,
+            "created_at"=>$created_at,
+            "updated_at"=>$updated_at
+        ]);
+        return redirect("/blogs");
+    }
+    function editPost($id){
+        $post= DB::table("posts")->where("id",$id)->first();
+        return view ("blog.edit",["post"=>$post]);
+    }
+    function updatePost(Request $request,$id){
+        $title= $request->input("title");
+        $content= $request->input("content");
+        $updated_at= now();
+        DB::table("posts")->where("id",$id)->update([
+            "title"=>$title,
+            "content"=>$content,
+            "updated_at"=>$updated_at,
+        ]);
+        return redirect("/blogs");
+    }
+
+    function deletePost($id){
+        DB::table("posts")->where("id",$id)->delete();
+        return redirect("/blogs");
     }
 
 }
